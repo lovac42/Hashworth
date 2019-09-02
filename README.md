@@ -15,9 +15,9 @@ Using regexps to remove tags: https://ankiweb.net/shared/info/1502698883
 
 ## Screenshots:
 
-<img src="https://github.com/lovac42/Wordsworth/blob/master/screenshots/dialog.png?raw=true">  
+<img src="https://github.com/lovac42/Hashworth/blob/master/screenshots/dialog.png?raw=true">  
 
-<img src="https://github.com/lovac42/Wordsworth/blob/master/screenshots/browser.png?raw=true">  
+<img src="https://github.com/lovac42/Hashworth/blob/master/screenshots/browser.png?raw=true">  
 
 ## API Used:
 Porter2-stemmer by Evan Dempsey, https://github.com/evandempsey/porter2-stemmer
