@@ -65,7 +65,7 @@ class Hashworth():
 
         r+=1
         fieldLayout=QtWidgets.QHBoxLayout()
-        label=QtWidgets.QLabel("Search Note Field:")
+        label=QtWidgets.QLabel("Hash From Note Field:")
         fieldLayout.addWidget(label)
 
         idx=self.conf.get("match_field",0)
@@ -115,6 +115,14 @@ class Hashworth():
         self.btn_save.clicked.connect(self.onWrite)
         gridLayout.addWidget(self.btn_save,r,0,1,1)
 
+        cbs=self.conf.get("strip_media",0)
+        self.cb_rm_media=QtWidgets.QCheckBox()
+        self.cb_rm_media.setCheckState(cbs)
+        self.cb_rm_media.clicked.connect(self.onChangedCB)
+        self.cb_rm_media.setText(_('No Sound'))
+        self.cb_rm_media.setToolTip(_('Strip [Sound] tags during search'))
+        gridLayout.addWidget(self.cb_rm_media, r, 1, 1, 1)
+
         diag=QDialog(self.browser)
         diag.setLayout(layout)
         diag.setWindowTitle(TITLE)
@@ -125,9 +133,11 @@ class Hashworth():
         cs=self.cb_casesense.checkState()
         sp=self.cb_rm_space.checkState()
         htm=self.cb_rm_html.checkState()
+        m=self.cb_rm_media.checkState()
         self.conf.set("case_sensitive",cs)
         self.conf.set("strip_html",htm)
         self.conf.set("strip_space",sp)
+        self.conf.set("strip_media",m)
 
 
     def checkWritable(self):
@@ -145,10 +155,11 @@ class Hashworth():
             sp=self.cb_rm_space.checkState()
             htm=self.cb_rm_html.checkState()
             norm=self.cb_normalize.checkState()
+            noMedia=self.cb_rm_media.checkState()
 
             self.proc=HashProcessor()
             self.proc.setFields(mf)
-            self.proc.setProperties(cs,sp,htm,norm)
+            self.proc.setProperties(cs,sp,htm,noMedia,norm)
             try:
                 self.proc.process(self.notes)
             except NoListError as err:

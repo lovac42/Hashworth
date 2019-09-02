@@ -22,6 +22,7 @@ from .lib.porter2stemmer import Porter2Stemmer
 
 
 RE_NOSPACE=re.compile(r'\s')
+RE_NOMEDIA=re.compile(r"\[sound:[^]]+\]")
 
 
 class HashProcessor:
@@ -35,10 +36,11 @@ class HashProcessor:
     def setFields(self, match_field):
         self.match_field=match_field
 
-    def setProperties(self, case_sensitive, no_space, no_html, norm):
+    def setProperties(self, case_sensitive, no_space, no_html, no_media, norm):
         self.case_sensitive=case_sensitive
         self.no_space=no_space
         self.no_html=no_html
+        self.no_media=no_media
         self.op_normalize=norm
 
 
@@ -73,6 +75,9 @@ class HashProcessor:
     def cleanWord(self, wd):
         if not self.case_sensitive:
             wd=wd.lower()
+
+        if self.no_media:
+            wd=RE_NOMEDIA.sub("",wd)
 
         if self.no_html:
             self.htmlCleaner.reset()
