@@ -15,6 +15,7 @@ from aqt.utils import showInfo
 from anki.lang import _
 from codecs import open
 
+from .utils import updatePTimer
 from .clean import Cleaner
 from .error import *
 from .const import *
@@ -22,27 +23,43 @@ from .lib.porter2stemmer import Porter2Stemmer
 
 
 RE_NOSPACE=re.compile(r'\s')
+
 RE_NOMEDIA=re.compile(r"\[sound:[^]]+\]")
+
+RE_NOCLOZE=re.compile(r"\{\{c\d+::(.*?)(\:\:.*?)?\}\}")
+
+RE_NOSCHAR=re.compile(r"[\x00\x08\x0B\x0C\x0E-\x1F]+")
+
+RE_PRONOUNS=re.compile(r"is|was|were|am|are|a|an|how|too?|not|I|me|mine|my(self)?|we|us|our(s|selves)?|your?s?|yoursel(f|ves)|he|hi[ms]|himself|she|her(s|self)?|it(s|self)?|the([ym]|irs?)?|themsel(f|ves)|th(is|ese|at|ose)|who(m|se)?|wh(at|ich)|one(s|self)", re.I)
 
 
 class HashProcessor:
+    duplicate={}
     htmlCleaner=Cleaner()
     stemmer=Porter2Stemmer()
     startTime=0
-    stat={}
+    dupCount=0
 
     # def __init__(self):
 
     def setFields(self, match_field):
         self.match_field=match_field
 
-    def setProperties(self, case_sensitive, no_space, no_html, no_media, norm):
+    def setProperties(self, case_sensitive, no_space, no_html,
+    no_media, no_cloze, no_schars, no_pronouns, norm):
         self.case_sensitive=case_sensitive
         self.no_space=no_space
         self.no_html=no_html
         self.no_media=no_media
+        self.no_cloze=no_cloze
+        self.no_schars=no_schars
+        self.no_pronouns=no_pronouns
         self.op_normalize=norm
 
+
+    def reset(self):
+        self.duplicate={}
+        self.dupCount=0
 
     def process(self, nids):
         if not nids:
@@ -57,8 +74,20 @@ class HashProcessor:
                not note[self.match_field]:
                 continue
             h=self.getHash(note)
-            note.addTag("Hashworth::%s"%h)
-            note.flush()
+            if not self.duplicate.get(h):
+                self.duplicate[h]=set()
+            self.duplicate[h].add(nid)
+
+        self.setDupCount()
+        return self.dupCount
+
+
+    def setDupCount(self):
+        self.dupCount=0
+        for hash,nids in self.duplicate.items():
+            if len(nids)>1:
+                self.dupCount+=1
+        return self.dupCount
 
 
     def getHash(self, note):
@@ -66,7 +95,8 @@ class HashProcessor:
         wd=note[self.match_field]
         wd=self.cleanWord(wd)
         wd=self.normalize(wd,type=1)
-        self.updatePTimer(wd)
+        # print(wd)
+        self.startTime=updatePTimer(self.startTime,wd)
         m=hashlib.md5()
         m.update(wd.encode('utf-8'))
         return m.hexdigest()
@@ -84,6 +114,21 @@ class HashProcessor:
             self.htmlCleaner.feed(wd)
             wd=self.htmlCleaner.toString()
 
+        if self.no_cloze:
+            wd=RE_NOCLOZE.sub("\g<1>",wd)
+
+        if self.no_schars:
+            wd=RE_NOSCHAR.sub("",wd)
+
+        if self.no_pronouns:
+            arr=[]
+            for w in wd.split(" "):
+                if not RE_PRONOUNS.match(w):
+                    arr.append(w)
+            if self.no_space:
+                return "".join(arr)
+            return " ".join(arr)
+
         if self.no_space: #space between words
             return RE_NOSPACE.sub("",wd)
         return wd.strip() #leading & trailing space
@@ -96,12 +141,5 @@ class HashProcessor:
             for w in wd.split():
                 wd=self.stemmer.stem(wd)
                 arr.append(wd)
-            return " ".join(wd)
+            return "".join(wd)
         return wd
-
-
-    def updatePTimer(self, labelText):
-        now = time.time()
-        if now-self.startTime >= 0.5:
-            self.startTime=now
-            mw.progress.update(_("%s"%labelText))

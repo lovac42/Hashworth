@@ -4,8 +4,10 @@
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
 
+import time
 from aqt import mw
 from anki.utils import ids2str
+from anki.lang import _
 
 
 def fieldNamesForNotes(nids):
@@ -17,3 +19,11 @@ def fieldNamesForNotes(nids):
             if name not in fields: #slower w/o
                 fields.add(name)
     return sorted(fields, key=lambda x: x.lower())
+
+
+def updatePTimer(startTime, labelText):
+    now = time.time()
+    if now-startTime >= 0.5:
+        startTime=now
+        mw.progress.update(_("%s"%labelText))
+    return startTime

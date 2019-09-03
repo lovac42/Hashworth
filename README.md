@@ -1,8 +1,11 @@
 ## Hashworth: Field Duplicate Finder
 
 ## About:
-This addon generates a hash value (MD5) for the selected field. This checksum will be added to the note's tag and any duplicated question can be filtered using these tags. Though the process is not perfect.
+This addon generates a hash value (MD5) for the selected field. Each field is processed and stripped of punctuation, pronouns, whitespace, etc... The checksum is used to search for duplicates in other notes/models that may have a different structure.
 
+So, to illustrate:  
+```"My ball.", "my balls!", "your ball?", "Your balls...", "Johny's Ball"```  
+Except for the last one, the first four are all duplicates after processing.
 
 
 ## Tag Management:
