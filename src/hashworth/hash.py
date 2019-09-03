@@ -74,6 +74,8 @@ class HashProcessor:
                not note[self.match_field]:
                 continue
             h=self.getHash(note)
+            if not h:
+                continue
             if not self.duplicate.get(h):
                 self.duplicate[h]=set()
             self.duplicate[h].add(nid)
@@ -96,10 +98,11 @@ class HashProcessor:
         wd=self.cleanWord(wd)
         wd=self.normalize(wd,type=1)
         # print(wd)
-        self.startTime=updatePTimer(self.startTime,wd)
-        m=hashlib.md5()
-        m.update(wd.encode('utf-8'))
-        return m.hexdigest()
+        if wd:
+            self.startTime=updatePTimer(self.startTime,wd)
+            m=hashlib.md5()
+            m.update(wd.encode('utf-8'))
+            return m.hexdigest()
 
 
     def cleanWord(self, wd):
