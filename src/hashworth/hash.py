@@ -22,15 +22,15 @@ from .const import *
 from .lib.porter2stemmer import Porter2Stemmer
 
 
-RE_NOSPACE=re.compile(r'\s')
+RE_SPACE=re.compile(r'\s+')
 
 RE_NOMEDIA=re.compile(r"\[sound:[^]]+\]")
 
 RE_NOCLOZE=re.compile(r"\{\{c\d+::(.*?)(\:\:.*?)?\}\}")
 
-RE_NOSCHAR=re.compile(r"[\x00\x08\x0B\x0C\x0E-\x1F]+")
+RE_NOSCHAR=re.compile(r"[’\x00-\1F\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7F]+")
 
-RE_PRONOUNS=re.compile(r"is|was|were|am|are|a|an|how|too?|not|I|me|mine|my(self)?|we|us|our(s|selves)?|your?s?|yoursel(f|ves)|he|hi[ms]|himself|she|her(s|self)?|it(s|self)?|the([ym]|irs?)?|themsel(f|ves)|th(is|ese|at|ose)|who(m|se)?|wh(at|ich)|one(s|self)", re.I)
+RE_PRONOUNS=re.compile(r"^(?:is|in|as|was|were|am|are|a|an|how|too?|not|I|me|mine|my(self)?|we|us|our(s|selves)?|your?s?|yoursel(f|ves)|he|hi[ms]|himself|she|her(s|self)?|it(s|self)?|the(n|[ym]|irs?)?|themsel(f|ves)|th(is|ese|at|ose)|who(m|se)?|wh(at|ich)|one(s|self)|if|else|of|for|does|be|with|lets?|and)$", re.I)
 
 
 class HashProcessor:
@@ -125,15 +125,15 @@ class HashProcessor:
 
         if self.no_pronouns:
             arr=[]
-            for w in wd.split(" "):
-                if not RE_PRONOUNS.match(w):
+            for w in RE_SPACE.split(wd):
+                if w and not RE_PRONOUNS.search(w):
                     arr.append(w)
             if self.no_space:
                 return "".join(arr)
             return " ".join(arr)
 
         if self.no_space: #space between words
-            return RE_NOSPACE.sub("",wd)
+            return RE_SPACE.sub("",wd)
         return wd.strip() #leading & trailing space
 
 
