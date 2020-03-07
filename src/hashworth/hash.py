@@ -15,11 +15,11 @@ from aqt.utils import showInfo
 from anki.lang import _
 from codecs import open
 
+from .lib.porter2stemmer import Porter2Stemmer
 from .utils import updatePTimer
 from .clean import Cleaner
 from .error import *
 from .const import *
-from .lib.porter2stemmer import Porter2Stemmer
 
 
 RE_SPACE=re.compile(r'\s+')
@@ -65,7 +65,7 @@ class HashProcessor:
         if not nids:
             raise NoNoteError
 
-        mw.checkpoint("Hashworth")
+        mw.checkpoint(ADDONNAME)
         self.startTime=time.time()
 
         for nid in nids:

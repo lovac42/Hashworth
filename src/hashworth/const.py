@@ -14,3 +14,5 @@ ANKI20 = version.startswith("2.0.")
 ADDONNAME = "Hashworth"
 
 TITLE = "Hashworth: Field Duplicate Finder"
+
+DEFAULT_HOTKEY = "Ctrl+Shift+H"

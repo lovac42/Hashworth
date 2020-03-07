@@ -10,6 +10,18 @@ from anki.utils import ids2str
 from anki.lang import _
 
 
+def getMenu(parent, menuName):
+    menu=None
+    for a in parent.form.menubar.actions():
+        if menuName == a.text():
+            menu=a.menu()
+            # menu.addSeparator()
+            break
+    if not menu:
+        menu=parent.form.menubar.addMenu(menuName)
+    return menu
+
+
 def fieldNamesForNotes(nids):
     fields = set()
     mids = mw.col.db.list("select distinct mid from notes where id in %s" % ids2str(nids))
@@ -27,3 +39,4 @@ def updatePTimer(startTime, labelText):
         startTime=now
         mw.progress.update(_("%s"%labelText))
     return startTime
+

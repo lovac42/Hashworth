@@ -25,3 +25,4 @@ Using regexps to remove tags: https://ankiweb.net/shared/info/1502698883
 ## API Used:
 Porter2-stemmer by Evan Dempsey, https://github.com/evandempsey/porter2-stemmer
 
+Made using Wordsworth's skeleton code: https://github.com/lovac42/Wordsworth
